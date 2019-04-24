@@ -1,0 +1,83 @@
+{
+  "name": "ws-gateway-b2b",
+  "version": "0.0.1",
+  "description": "Servico de entrada do b2b",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon --watch 'src/' --exec 'npm run tslint && NODE_ENV=development && npm run test && ts-node src/index.ts' -e ts",
+    "build": "tsc",
+    "test": "jest -o",
+    "tslint": "tslint -c tslint.json -p tsconfig.json",
+    "prod": "npm run build && node dist/app.js",
+    "testCoverage": "jest --coverage --coverageDirectory=output/coverage/jest"
+  },
+  "jest": {
+    "transform": {
+      "^.+\\.ts$": "ts-jest"
+    },
+    "testRegex": "\\.test\\.ts",
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js",
+      "jsx",
+      "json",
+      "node"
+    ],
+    "coverageReporters": [
+      "text",
+      "cobertura",
+      "lcov"
+    ],
+    "collectCoverageFrom": [
+      "**/src/**/*.ts",
+      "!**/src/{app,index}.ts",
+      "!**/src/models/index.ts"
+    ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "http://192.168.150.11/b2b-services/ws-gateway-b2b.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "apollo-datasource": "^0.3.1",
+    "apollo-datasource-rest": "^0.3.2",
+    "apollo-server": "^2.4.8",
+    "apollo-server-express": "^2.4.8",
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dataloader": "^1.4.0",
+    "express": "4.16.2",
+    "graphql": "^14.2.1",
+    "jsonwebtoken": "^8.5.1",
+    "node-fetch": "^2.3.0",
+    "pg": "^7.9.0",
+    "pg-hstore": "^2.3.2",
+    "sequelize": "4.13.10"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.2",
+    "@types/graphql": "^14.2.0",
+    "@types/jest": "^24.0.11",
+    "@types/jsonwebtoken": "^8.3.2",
+    "@types/lodash": "^4.14.123",
+    "@types/node": "^11.13.4",
+    "@types/sequelize": "4.0.76",
+    "apollo": "^2.8.3",
+    "apollo-link": "^1.2.11",
+    "apollo-link-http": "^1.5.14",
+    "apollo-server-testing": "^2.4.8",
+    "jest": "^24.7.1",
+    "nodemon": "^1.18.11",
+    "prettier": "1.17.0",
+    "sequelize-mock": "^0.10.2",
+    "ts-jest": "^24.0.2",
+    "ts-node": "^8.1.0",
+    "tslint": "^5.16.0",
+    "tslint-config-prettier": "^1.18.0",
+    "typescript": "^3.4.3",
+    "typescript-eslint-parser": "^22.0.0"
+  }
+}
