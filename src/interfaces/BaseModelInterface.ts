@@ -1,7 +1,6 @@
-import {ModelsInterface} from "./ModelsInterface";
+import { ModelsInterface } from './ModelsInterface';
 
 export interface BaseModelInterface {
-
-    prototype?: any;
-    associate?(models: ModelsInterface): void;
+  prototype?: any;
+  associate?(models: ModelsInterface): void;
 }

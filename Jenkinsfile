@@ -22,6 +22,7 @@ pipeline {
                 rocketSend message: "Build iniciada", attachments: [[title: "#${env.BUILD_NUMBER}", titleLink: "${env.BUILD_URL}", text: "${env.JOB_NAME} - ${GIT_BRANCH}"]], rawMessage: true, webhookToken: "${ROCKET_TOKEN}"
                 script {
                     sh 'npm install'
+                    sh 'rm -rf ./output'
                 }
             }
         }
@@ -55,9 +56,10 @@ pipeline {
         stage('Build') {
             steps {
                 script {
+                    sh 'rm -rf dist'
                     sh 'npm run build'
                     sh 'cp package.json dist/'
-                    sh 'cp -r src/config dist/'
+                    sh 'cp -r src/config dist/src'
                     sh 'tar -czvf dist.tar.gz dist/*'
                 }
             }

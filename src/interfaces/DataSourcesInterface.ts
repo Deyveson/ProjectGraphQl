@@ -1,9 +1,9 @@
-import { CatalogoAPI } from '../graphql/datasource'
-import { PrecoAPI } from '../graphql/datasource'
-import ClienteAPI from '../graphql/resources/catalogo/clienteDataSouce'
+import * as dataSources from '../graphql/resources/datasources';
 
 export interface DataSources {
-  catalogoApi: CatalogoAPI
-  precoApi: PrecoAPI
-  clienteApi: ClienteAPI
+  catalogoApi: dataSources.CatalogoAPI;
+  precoApi: dataSources.PrecoAPI;
+  geralApi: dataSources.GeralAPI;
+  imagemApi: dataSources.ImagemAPI;
+  pessoaApi: dataSources.PessoaApi;
 }

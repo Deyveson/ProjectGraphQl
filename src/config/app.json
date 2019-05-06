@@ -1,0 +1,34 @@
+{
+  "NAMESPACE": "pmz",
+  "ENDPOINT": {
+    "PROTOCOL": "http",
+    "HOST": "localhost",
+    "PORT": 3000,
+    "GRAPHQL": "/graphql",
+    "GRAPHIQL": "/graphiql",
+    "PAYLOAD": {
+      "JSON": {
+        "LIMIT": "50mb"
+      },
+      "URL_ENCODED": {
+        "LIMIT": "50mb",
+        "PARAMETER_LIMIT": 100000
+      }
+    }
+  },
+  "CONSTANTS": {
+    "HTTP_ONLY": "HTTP_ONLY",
+    "LOCAL_STORAGE": "LOCAL_STORAGE",
+    "FORBIDDEN": "Acesso proibido!",
+    "UNAUTHORIZED": "Acesso não autorizado!",
+    "NOT_ALLOWED": "Acesso não permitido!"
+  },
+  "STRATEGIES": {
+    "HTTP_ONLY": true,
+    "LOCAL_STORAGE": true
+  },
+  "PREFIX": "x-",
+  "TOKEN_SUFFIX": "-token",
+  "REFRESH_TOKEN_SUFFIX": "-refresh-token",
+  "AUTH_HEADER_SUFFIX": "-auth-request-type"
+}

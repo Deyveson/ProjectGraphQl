@@ -2,3 +2,4 @@ node_modules
 dist
 output
 test-report.xml
+package-lock\.json
