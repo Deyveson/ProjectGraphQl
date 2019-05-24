@@ -1,8 +1,7 @@
 import { GraphQLFieldResolver } from 'graphql';
-
+import { UNAUTHORIZED } from '../../environment';
 import { ResolverContext } from '../../interfaces/ResolverContextInterface';
 import { verifyTokenResolver } from './verify-token.resolver';
-import { UNAUTHORIZED } from '../../environment';
 
 export const authResolver = (
   resolver: GraphQLFieldResolver<any, ResolverContext>,

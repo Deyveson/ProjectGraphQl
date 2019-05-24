@@ -1,11 +1,9 @@
 import { RESTDataSource } from 'apollo-datasource-rest';
 
 class ImagemApi extends RESTDataSource {
-  constructor() {
+  constructor(config) {
     super();
-    // @ts-ignore
-    this.initialize({ context: {} });
-    this.baseURL = 'http://192.168.151.85:5555/';
+    this.baseURL = `${config.imagemUrl}/`;
   }
 
   public async searchImagem(buscaImagem) {

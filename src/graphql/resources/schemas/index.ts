@@ -6,25 +6,22 @@ import {
 } from './autocomplete.schema';
 import { produtoMutations, produtoQueries, produtoTypes } from './catalogo.schema';
 import { clienteMutations, clienteQueries, clienteType } from './cliente.schema';
-import { geralQueries, geralTypes } from './geral.schema';
-import { imagemMutations, imagemQueries, imagemTypes } from './imagem.schema';
-import { precoMutations, precoQueries, precoTypes } from './preco.schema';
-import { similarMutations, similarQueries, similarTypes } from './similar.schema';
-import { tokenMutations, tokenTypes } from './token.schema';
+import { condicaoMutations, condicaoQueries, condicaoType } from './codicaoPagamento.schema';
+import { estoqueMutations, estoqueQueries, estoqueType } from './estoque.schema';
+import { pedidoMutations, pedidoQueries, pedidoType } from './pedido.schema';
+import { pessoaMutations, pessoaQueries, pessoaTypes } from './pessoa.schema';
 import { usuarioMutations, usuarioQueries, usuarioTypes } from './usuario.schema';
-import { pessoaMutations, pessoaTypes, pessoaQueries } from './pessoa.schema';
 
 const mutations = [
   aplicacoesMutations,
   autocompleteMutations,
   produtoMutations,
   clienteMutations,
-  imagemMutations,
-  precoMutations,
-  similarMutations,
-  tokenMutations,
   usuarioMutations,
   pessoaMutations,
+  estoqueMutations,
+  condicaoMutations,
+  pedidoMutations,
 ];
 
 const types = [
@@ -32,13 +29,11 @@ const types = [
   autocompleteTypes,
   produtoTypes,
   clienteType,
-  geralTypes,
-  imagemTypes,
-  precoTypes,
-  similarTypes,
-  tokenTypes,
   usuarioTypes,
   pessoaTypes,
+  estoqueType,
+  condicaoType,
+  pedidoType,
 ];
 
 const queries = [
@@ -46,12 +41,11 @@ const queries = [
   autocompleteQueries,
   produtoQueries,
   clienteQueries,
-  geralQueries,
-  imagemQueries,
-  precoQueries,
-  similarQueries,
   usuarioQueries,
   pessoaQueries,
+  estoqueQueries,
+  condicaoQueries,
+  pedidoQueries,
 ];
 
 export { mutations, types, queries };

@@ -1,4 +1,3 @@
+export { AUTH, CLIENT_AUTHENTICATION_METHOD, CLIENT_AUTH_REQUEST_TYPE, JWT } from './auth';
+export { FORBIDDEN, NOT_ALLOWED, UNAUTHORIZED } from './authorization';
 export { ERROR } from './errors';
-export { UNAUTHORIZED, FORBIDDEN, NOT_ALLOWED } from './authorization';
-export { JWT, AUTH, CLIENT_AUTH_REQUEST_TYPE, CLIENT_AUTHENTICATION_METHOD } from './auth';
-

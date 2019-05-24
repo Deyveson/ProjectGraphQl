@@ -1,9 +1,8 @@
-import * as jwt from 'jsonwebtoken';
 import { GraphQLFieldResolver } from 'graphql';
-
+import * as jwt from 'jsonwebtoken';
+import { UNAUTHORIZED } from '../../environment';
 import { ResolverContext } from '../../interfaces/ResolverContextInterface';
 import { JWT_TOKEN_SECRET } from '../../utils/utils';
-import { UNAUTHORIZED } from '../../environment';
 
 export const verifyTokenResolver = (
   resolver: GraphQLFieldResolver<any, ResolverContext>,

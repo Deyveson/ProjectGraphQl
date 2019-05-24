@@ -1,11 +1,9 @@
 import { RESTDataSource } from 'apollo-datasource-rest';
 
 class PessoaApi extends RESTDataSource {
-  constructor() {
+  constructor(config) {
     super();
-    // @ts-ignore
-    this.initialize({ context: {} });
-    this.baseURL = 'http://192.168.151.89:8000/ws-pessoa/api/';
+    this.baseURL = `${config.microServicesUrl}/ws-pessoa/api/`;
   }
 
   public async searchPessoa(text) {
@@ -38,6 +36,7 @@ class PessoaApi extends RESTDataSource {
 
   private pessoaReducerFisica(pessoa) {
     return {
+      id: pessoa.id,
       nomeCompleto: pessoa.nomeCompleto,
       nomeFantasia: pessoa.nomeFantasia,
       tipoPessoa: pessoa.tipoPessoa,
@@ -53,6 +52,7 @@ class PessoaApi extends RESTDataSource {
 
   private pessoaReducerJuridica(pessoa) {
     return {
+      id: pessoa.id,
       nomeCompleto: pessoa.nomeCompleto,
       nomeFantasia: pessoa.nomeFantasia,
       tipoPessoa: pessoa.tipoPessoa,

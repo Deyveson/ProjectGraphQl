@@ -6,4 +6,6 @@ export interface DataSources {
   geralApi: dataSources.GeralAPI;
   imagemApi: dataSources.ImagemAPI;
   pessoaApi: dataSources.PessoaApi;
+  pedidoService: dataSources.PedidoService;
+  usuarioService: dataSources.UsuarioService;
 }

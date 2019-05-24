@@ -1,11 +1,9 @@
 import { RESTDataSource } from 'apollo-datasource-rest';
 
 class CatalogoAPI extends RESTDataSource {
-  constructor() {
+  constructor(config) {
     super();
-    // @ts-ignore
-    this.initialize({ context: {} });
-    this.baseURL = 'http://192.168.151.89:8000/ws-catalogo/api/';
+    this.baseURL = `${config.catalogoUrl}/ws-catalogo/api/`;
   }
 
   public async searchProduto(pesqProduto) {
@@ -13,12 +11,16 @@ class CatalogoAPI extends RESTDataSource {
     const produtosPage = {
       produtos: response.produtos.content,
       tags: response.tags,
+      numeroElementos: response.produtos.numberOfElements,
+      numeroPagina: response.produtos.number,
+      totalElementos: response.produtos.totalElements,
+      totalPaginas: response.produtos.totalPages,
     };
     return produtosPage;
   }
 
   public async searchAplicacoes(buscaAplicacoes) {
-    const aplicacoes = await this.get('produto/aplicacoes', buscaAplicacoes);
+    const aplicacoes = await this.get('produto/pageAplicacoes', buscaAplicacoes);
     return aplicacoes;
   }
 

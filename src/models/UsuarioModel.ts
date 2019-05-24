@@ -1,8 +1,8 @@
+import { compareSync } from 'bcryptjs';
 import * as Sequelize from 'sequelize';
 import { BaseModelInterface } from '../interfaces/BaseModelInterface';
 import { ModelsInterface } from '../interfaces/ModelsInterface';
 import { PerfilInstance } from './PerfilModel';
-import { compareSync } from 'bcryptjs';
 // import {encode} from "punycode";
 
 export interface UsuarioAttributes {
@@ -22,6 +22,11 @@ export interface UsuarioInstance extends Sequelize.Instance<UsuarioAttributes>, 
 export interface UsuarioModel
   extends BaseModelInterface,
     Sequelize.Model<UsuarioInstance, UsuarioAttributes> {}
+
+export const UsuarioMethods = {
+  isPassword: (encodedPassword: string, password: string): boolean =>
+    compareSync(password, encodedPassword),
+};
 
 export default (sequelize: Sequelize.Sequelize, DataTypes: Sequelize.DataTypes): UsuarioModel => {
   const Usuario: UsuarioModel = sequelize.define(
@@ -75,10 +80,7 @@ export default (sequelize: Sequelize.Sequelize, DataTypes: Sequelize.DataTypes):
     });
   };
 
-  Usuario.prototype.isPassword = (encodedPassword: string, password: string): boolean => {
-    return compareSync(password, encodedPassword);
-    // return password.toUpperCase() === encodedPassword.toUpperCase();
-  };
+  Usuario.prototype.isPassword = UsuarioMethods.isPassword;
 
   return Usuario;
 };

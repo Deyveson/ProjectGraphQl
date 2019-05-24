@@ -1,5 +1,5 @@
 import { ApolloServerBase } from 'apollo-server-core';
-import { print, DocumentNode } from 'graphql';
+import { DocumentNode, print } from 'graphql';
 
 type StringOrAst = string | DocumentNode;
 

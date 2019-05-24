@@ -1,6 +1,6 @@
+import * as jwt from 'jsonwebtoken';
 import { verifyTokenResolver } from '../../../src/graphql/composable/verify-token.resolver';
 import { JWT_TOKEN_SECRET } from '../../../src/utils/utils';
-import * as jwt from 'jsonwebtoken';
 
 describe('Test verify token resolver', () => {
   it('Should throw when no authorization token provided', () => {

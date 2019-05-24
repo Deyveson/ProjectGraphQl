@@ -1,19 +1,25 @@
 const aplicacoesTypes = `
 type Aplicacoes{
-    aplicacao: String!
-    inicio: String!
-    fim: String!
-    original: String!
+  listaDados: [ListaDados]!
+  pagina: Int!
+  totalPorPagina: Int!
+  totalElements: Int!
+}
+
+type ListaDados{
+  nomeCarro: String!
+  modelTipos: [ModelTipos]
 }
 
 input BuscaAplicacoes {
-    empresa: Int!,
-    fornecedor: Int!,
-    produto: String!
+  page: Int!,
+  count: Int!,
+  codProduto: String!
+  aplicacao: String
 }
 `;
 const aplicacoesQueries = `
-    getAplicacoes(buscaAplicacoes: BuscaAplicacoes!): [Aplicacoes]!
+    getAplicacoes(buscaAplicacoes: BuscaAplicacoes!): Aplicacoes!
 `;
 
 const aplicacoesMutations = `

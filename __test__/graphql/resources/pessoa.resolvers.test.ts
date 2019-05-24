@@ -1,13 +1,10 @@
-import * as jwt from 'jsonwebtoken';
-import { JWT_TOKEN_SECRET } from '../../../src/utils/utils';
+import { gql } from 'apollo-server';
 import { createTestClient } from 'apollo-server-testing';
 import { constructTestServer } from '../../__utils';
-import { gql } from 'apollo-server';
 
 describe('Test Pessoa', () => {
-  const secret = `Bearer: ${jwt.sign('123456', JWT_TOKEN_SECRET)}`;
   it('endpoint cpf test', async () => {
-    const { server, pessoaApi } = constructTestServer({ authUser: 1, authorization: secret });
+    const { server, pessoaApi, geralApi } = constructTestServer({ authorization: true });
 
     // @ts-ignore
     pessoaApi.get = jest.fn(() => ({
@@ -97,6 +94,17 @@ describe('Test Pessoa', () => {
         percentualAumento: 0,
       },
     }));
+    // @ts-ignore
+    geralApi.get = jest.fn(() => [
+      {
+        limite: 0,
+        em_aberto: 0,
+        saldo: 0,
+        aviso: null,
+        permissao: null,
+        bloqueado: '',
+      },
+    ]);
 
     const { query } = createTestClient(server);
 
@@ -175,6 +183,10 @@ describe('Test Pessoa', () => {
               metragemOfic
               percentualAumento
             }
+            saldo {
+              limite
+              emAberto
+            }
           }
         }
       `,
@@ -185,7 +197,7 @@ describe('Test Pessoa', () => {
   });
 
   it('endpoint cnpj test', async () => {
-    const { server, pessoaApi } = constructTestServer({ authUser: 1, authorization: secret });
+    const { server, pessoaApi, geralApi } = constructTestServer({ authorization: true });
 
     // @ts-ignore
     pessoaApi.get = jest.fn(() => ({
@@ -221,6 +233,17 @@ describe('Test Pessoa', () => {
         },
       ],
     }));
+    // @ts-ignore
+    geralApi.get = jest.fn(() => [
+      {
+        limite: 0,
+        em_aberto: 0,
+        saldo: 0,
+        aviso: null,
+        permissao: null,
+        bloqueado: '',
+      },
+    ]);
 
     const { query } = createTestClient(server);
 
@@ -261,6 +284,10 @@ describe('Test Pessoa', () => {
               tipoPreco
               percentualAumento
             }
+            saldo {
+              saldo
+              emAberto
+            }
           }
         }
       `,
@@ -271,7 +298,7 @@ describe('Test Pessoa', () => {
   });
 
   it('endpoint test null', async () => {
-    const { server, pessoaApi } = constructTestServer({ authUser: 1, authorization: secret });
+    const { server, pessoaApi } = constructTestServer({ authorization: true });
 
     // @ts-ignore
     pessoaApi.get = jest.fn(() => ({
@@ -354,5 +381,83 @@ describe('Test Pessoa', () => {
 
     // @ts-ignore
     expect(res.data.getPessoa).not.toBeNull();
+  });
+
+  it('Should return default saldo for consumidor final', async () => {
+    const { server, pessoaApi } = constructTestServer({ authorization: true });
+
+    // @ts-ignore
+    pessoaApi.get = jest.fn(() => ({
+      nomeCompleto: 'CONSUMIDOR FINAL',
+      nomeFantasia: 'CONSUMIDOR FINAL',
+    }));
+
+    const { query } = createTestClient(server);
+    const res = await query({
+      query: gql`
+        {
+          getPessoa {
+            nomeCompleto
+            nomeFantasia
+            saldo {
+              saldo
+              emAberto
+            }
+          }
+        }
+      `,
+    });
+
+    // @ts-ignore
+    expect(res.data.getPessoa.saldo.saldo).toBe(0);
+  });
+
+  it('test in payment condition endpoint', async () => {
+    const { server, geralApi, pessoaApi } = constructTestServer({ authorization: true });
+
+    // @ts-ignore
+    pessoaApi.get = jest.fn(() => ({
+      clientes: {
+        tipoPreco: 'N',
+        prazoMedio: 0,
+      },
+    }));
+    // @ts-ignore
+    geralApi.get = jest.fn(() => [
+      {
+        recnum: null,
+        codigo: 'A8',
+        nomeCondicaoPagamento: null,
+        descricao: 'ATAC P/ 1 DIA',
+        parcelas: 1,
+        periodo: 0,
+        periodoEntrada: 1,
+        descontoMedio: 29.4,
+        documento: null,
+      },
+    ]);
+
+    const { query } = createTestClient(server);
+
+    const res = await query({
+      query: gql`
+        {
+          getCondicao {
+            recnum
+            codigo
+            nomeCondicaoPagamento
+            descricao
+            parcelas
+            periodo
+            periodoEntrada
+            descontoMedio
+            documento
+          }
+        }
+      `,
+    });
+
+    // @ts-ignore
+    expect(res.data.getCondicao[0]).toHaveProperty('descricao');
   });
 });

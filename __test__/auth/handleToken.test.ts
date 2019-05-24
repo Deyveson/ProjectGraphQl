@@ -1,5 +1,5 @@
-import { createTokens, refreshTokens } from '../../src/authentication/handleTokens';
 import * as jwt from 'jsonwebtoken';
+import { createTokens, refreshTokens } from '../../src/authentication/handleTokens';
 import { JWT_TOKEN_REFRESH_SECRET } from '../../src/utils/utils';
 
 describe('Handle tokens', () => {

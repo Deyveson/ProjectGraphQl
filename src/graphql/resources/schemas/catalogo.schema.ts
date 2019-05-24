@@ -2,6 +2,10 @@ const produtoTypes = `
 type ProdutosPage{
     produtos: [Produto]!
     tags: [String]!
+    numeroElementos: Int!
+    numeroPagina: Int!
+    totalElementos: Int!
+    totalPaginas: Int!
 }
 
 type Produto{
@@ -36,13 +40,21 @@ type Produto{
   perfil: String
   viscosidade: String
   amperagem: String
-  preco: PrecoProduto
+  unidade: PrecoProduto
+  caixa: PrecoProduto
   imagem: String
+  estoque: EstoqueProduto
 }
 
 type PrecoProduto {
-  valor: Float!
-  unidadeVenda: String!
+  preco: Float!
+  qtd: String!
+}
+
+type EstoqueProduto {
+  qtd: Int!
+  qtdInventario: Int!
+  qtdDisponivel: Int!
 }
 
 type Models{
@@ -68,10 +80,19 @@ input PesqProduto{
     nomeProduto: String!
     cpfCnpj: String
 }
+
+input PesqSimilar {
+  filial: Int!
+  empresa: Int!
+  fornecedor: Int!
+  produto: String!
+  cpfCnpj: String
+}
 `;
 
 const produtoQueries = `
     getProdutos(pesqProduto: PesqProduto!): ProdutosPage!
+    getSimilares(pesqSimilar: PesqSimilar): [Produto]!
 `;
 
 const produtoMutations = `

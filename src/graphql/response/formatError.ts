@@ -1,13 +1,13 @@
 import { ApolloError } from 'apollo-server';
-import { v4 } from 'uuid';
-import { GraphQLError } from 'graphql';
-import { FORBIDDEN, UNAUTHORIZED, ERROR } from '../../environment';
+import { ERROR, FORBIDDEN, UNAUTHORIZED } from '../../environment';
 
 const e401s = [
   ERROR.USER.WRONG_CREDENTIALS,
   ERROR.USER.WRONG_PASSWORD,
   ERROR.USER.DOES_NOT_EXIST,
   ERROR.USER.EMPTY_CREDENTIALS,
+  ERROR.USER.EMPTY_PERFIL,
+  ERROR.USER.ACCESS_INACTIVE,
   UNAUTHORIZED,
 ];
 
@@ -15,11 +15,20 @@ const e403s = [FORBIDDEN];
 
 export const formatError = err => {
   let error = err;
-  const maskError = !(error.originalError instanceof ApolloError) && !e401s.includes(err.message) && !e403s.includes(err.message);
+  const maskError =
+    !(error.originalError instanceof ApolloError) &&
+    !e401s.includes(err.message) &&
+    !e403s.includes(err.message);
   if (maskError) {
-    const errId = v4();
-
-    return new GraphQLError(`Internal Error: [Log id] ${errId}`);
+    error = {
+      message: error.message,
+      status: 500,
+      location: error.location,
+      path: error.path,
+      extensions: {
+        code: 500,
+      },
+    };
   }
   if (e401s.includes(err.message)) {
     error = {

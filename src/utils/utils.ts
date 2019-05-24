@@ -1,5 +1,5 @@
-import { ComposableResolver, GraphQLB2BResolver } from '../types/GraphqlTypes';
 import { ResolverContext } from '../interfaces/ResolverContextInterface';
+import { ComposableResolver, GraphQLB2BResolver } from '../types/GraphqlTypes';
 
 export const normalizePort = (val: number | string): number => {
   return typeof val === 'string' ? parseInt(val) : val;
@@ -62,8 +62,9 @@ export const mapDynamicFields = async (
  */
 function findGraphQLSelectionField(selection, fieldPath: string) {
   const fieldList = fieldPath.split('.');
-  const field = selection['selectionSet']['selections'].find(
-    selection => selection['name']['value'] === fieldList[0],
+  const fieldsOr = fieldList[0].split('|');
+  const field = selection['selectionSet']['selections'].find(selection =>
+    fieldsOr.some(option => selection['name']['value'] === option),
   );
   if (field != null) {
     if (fieldList.length > 1) {

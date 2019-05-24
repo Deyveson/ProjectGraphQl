@@ -1,9 +1,19 @@
 {
-    "editor.formatOnSave": true,
-    "javascript.format.enable": false,
-    "files.autoSave": "onWindowChange",
-    "files.trimTrailingWhitespace": true,
-    "[markdown]": {
-        "files.trimTrailingWhitespace": false
-    }
+  "editor.formatOnSave": true,
+  "javascript.format.enable": false,
+  "files.autoSave": "onWindowChange",
+  "files.trimTrailingWhitespace": true,
+  "[markdown]": {
+    "files.trimTrailingWhitespace": false
+  },
+  "editor.codeActionsOnSave": {
+    "source.organizeImports": true
+  },
+  "todo-tree.defaultHighlight": {
+    "type": "text",
+    "background": "green",
+    "foreground": "red",
+    "opacity": 50,
+    "iconColour": "green"
+  }
 }

@@ -1,11 +1,16 @@
-import { authResolvers } from '../../composable/auth.resolver';
-import { handleError, gqlCompose, mapDynamicFields } from '../../../utils/utils';
 import { ResolverContext } from '../../../interfaces/ResolverContextInterface';
+import { gqlCompose, handleError, mapDynamicFields } from '../../../utils/utils';
+import { authResolvers } from '../../composable/auth.resolver';
 
-const camposDinamicos = {
-  'getProdutos.produtos.preco': async (args, { dataSources }: ResolverContext, produtosPage) => {
-    const consumidor = await dataSources.pessoaApi.searchPessoa(args.text);
+const getProdutosDynamic = {
+  'getProdutos.produtos.unidade|caixa': async (
+    cpfCnpj,
+    { dataSources }: ResolverContext,
+    produtosPage,
+  ) => {
+    const consumidor = await dataSources.pessoaApi.searchPessoa(cpfCnpj);
 
+    // TODO Tirar dados mockados
     const buscaProduto = produtosPage.produtos.map(produto => ({
       condicao: 'XXXXXXX',
       descontoItem: 0,
@@ -27,16 +32,15 @@ const camposDinamicos = {
           produtoPreco.empresa.toString() === produto.idEmpresa &&
           produtoPreco.produto === produto.codigoProduto,
       );
-      const preco =
-        produtoEncontrado != null
-          ? {
-              valor: produtoEncontrado.unidade[0].preco,
-              unidadeVenda: produtoEncontrado.unidade[0].tipo,
-            }
-          : null;
-      return { ...produto, preco };
+      let unidade = null;
+      let caixa = null;
+      if (produtoEncontrado != null) {
+        unidade = produtoEncontrado.unidade.find(un => un.tipo === 'UN');
+        caixa = produtoEncontrado.unidade.find(un => un.tipo === 'CX');
+      }
+      return { ...produto, unidade, caixa };
     });
-    return { produtos: produtosComPreco, tags: produtosPage.tags };
+    return { ...produtosPage, produtos: produtosComPreco };
   },
   'getProdutos.produtos.imagem': async (args, { dataSources }: ResolverContext, produtosPage) => {
     const buscaImagem = produtosPage.produtos.map(produto => ({
@@ -57,6 +61,47 @@ const camposDinamicos = {
 
     return { ...produtosPage, produtos: produtosComImagem };
   },
+  'getProdutos.produtos.estoque': async (
+    cpfCnpj,
+    { dataSources }: ResolverContext,
+    produtosPage,
+  ) => {
+    const consumidor = await dataSources.pessoaApi.searchPessoa(cpfCnpj);
+    const produtosComEstoque = await produtosPage.produtos.map(async produto => {
+      const buscaEstoque = {
+        uf: consumidor['enderecos']['codUf'] || 'AM',
+        produto: produto.codigoProduto,
+        empresa: produto.idEmpresa,
+        fornecedor: produto.idFornecedor,
+      };
+
+      try {
+        const estoque = await dataSources.geralApi.searchEstoque(buscaEstoque);
+        const reducedEstoque = estoque.reduce(
+          (soma, atual) => ({
+            qtd: soma.qtd + Math.floor(atual.qtd),
+            qtdInventario: soma.qtdInventario + Math.floor(atual.qtdInventario),
+          }),
+          { qtd: 0, qtdInventario: 0 },
+        );
+        return {
+          ...produto,
+          estoque: {
+            ...reducedEstoque,
+            qtdDisponivel: Math.min(reducedEstoque.qtd, reducedEstoque.qtdInventario),
+          },
+        };
+      } catch (error) {
+        return produto;
+      }
+    });
+    return { ...produtosPage, produtos: produtosComEstoque };
+  },
+};
+
+const getSimilaresDynamic = {
+  'getSimilares.unidade|caixa': getProdutosDynamic['getProdutos.produtos.unidade|caixa'],
+  'getSimilares.imagem': getProdutosDynamic['getProdutos.produtos.imagem'],
 };
 
 export const catalogoResolvers = {
@@ -68,8 +113,8 @@ export const catalogoResolvers = {
           .catch(handleError);
 
         const newProdutosPage = await mapDynamicFields(
-          camposDinamicos,
-          { pesqProduto },
+          getProdutosDynamic,
+          pesqProduto.cpfCnpj,
           context,
           info,
           produtosPage,
@@ -83,9 +128,19 @@ export const catalogoResolvers = {
         return dataSources.catalogoApi.searchAplicacoes(buscaAplicacoes).catch(handleError);
       },
     ),
-    getSimilar: gqlCompose(...authResolvers)(
-      async (parent, { buscaSimilar }, { dataSources }: ResolverContext, info) => {
-        return dataSources.catalogoApi.searchSimilar(buscaSimilar).catch(handleError);
+    getSimilares: gqlCompose(...authResolvers)(
+      async (parent, { pesqSimilar }, context: ResolverContext, info) => {
+        const similares = await context.dataSources.catalogoApi
+          .searchSimilar(pesqSimilar)
+          .catch(handleError);
+        const { produtos } = await mapDynamicFields(
+          getSimilaresDynamic,
+          pesqSimilar.cpfCnpj,
+          context,
+          info,
+          { produtos: similares },
+        );
+        return produtos;
       },
     ),
     getcliente: gqlCompose(...authResolvers)(
@@ -98,6 +153,11 @@ export const catalogoResolvers = {
       async (parent, args, { dataSources }: ResolverContext) => {
         const autocomplete = Object.assign({ args });
         return dataSources.catalogoApi.searchAutocomplete(autocomplete).catch(handleError);
+      },
+    ),
+    getEstoque: gqlCompose(...authResolvers)(
+      async (parent, { buscaEstoque }, { dataSources }: ResolverContext, info) => {
+        return dataSources.geralApi.searchEstoque(buscaEstoque).catch(handleError);
       },
     ),
   },

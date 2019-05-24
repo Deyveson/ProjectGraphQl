@@ -3,14 +3,29 @@ type Pessoa{
   id: ID!
   nomeCompleto: String
   nomeFantasia: String
-  tipoPessoa: String
+  tipoPessoa: TipoPessoa!
   dataCadastro: String
   tipoCadastro: Int
   emails: [Emails]
-  enderecos: [Enderecos]
+  enderecos: [Endereco]
   telefones: [Telefones]
   pessoaCadastro: PessoaCadastro
   clientes: Clientes
+  saldo: SaldoCliente
+}
+
+enum TipoPessoa {
+  PJ
+  PF
+}
+
+type SaldoCliente {
+  limite: Float!
+  emAberto: Float!
+  saldo: Float!
+  aviso: String
+  permissao: String
+  bloqueado: String!
 }
 
 type Email {
@@ -20,7 +35,7 @@ type Email {
   contato: String
 }
 
-type Enderecos {
+type Endereco {
   id: Int
   inscricaoEstadual: InscricaoEstadual
   codPais: Int
@@ -118,7 +133,7 @@ type Emails {
 `;
 
 const pessoaQueries = `
-  getPessoa(text: String!): Pessoa!
+  getPessoa(text: String): Pessoa!
 `;
 
 const pessoaMutations = `

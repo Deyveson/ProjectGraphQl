@@ -1,16 +1,11 @@
-import * as jwt from 'jsonwebtoken';
-import { JWT_TOKEN_SECRET } from '../../../src/utils/utils';
+import { gql } from 'apollo-server';
 import { createTestClient } from 'apollo-server-testing';
 import { constructTestServer } from '../../__utils';
-import { gql } from 'apollo-server';
 
 describe('Test Catalog', () => {
-  const secret = `Bearer: ${jwt.sign('123456', JWT_TOKEN_SECRET)}`;
-
   it('test on request response', async () => {
-    const { server, catalogoApi, pessoaApi, precoApi, imagemApi } = constructTestServer({
-      authUser: 1,
-      authorization: secret,
+    const { server, catalogoApi, pessoaApi, precoApi, imagemApi, geralApi } = constructTestServer({
+      authorization: true,
     });
 
     // @ts-ignore
@@ -206,6 +201,15 @@ describe('Test Catalog', () => {
         ImgBase64: 'Imagem',
       },
     ]);
+    // @ts-ignore
+    geralApi.get = jest.fn(() => [
+      {
+        filial: 34,
+        produto: 'B47097',
+        qtd: 31,
+        qtdInventario: 31,
+      },
+    ]);
 
     const { query } = createTestClient(server);
 
@@ -264,11 +268,14 @@ describe('Test Catalog', () => {
               perfil
               viscosidade
               amperagem
-              preco {
-                valor
-                unidadeVenda
+              unidade {
+                preco
+                qtd
               }
               imagem
+              estoque {
+                qtd
+              }
             }
             tags
           }
@@ -282,8 +289,7 @@ describe('Test Catalog', () => {
 
   it('Should return empty image and preco when not found', async () => {
     const { server, catalogoApi, pessoaApi, precoApi, imagemApi } = constructTestServer({
-      authUser: 1,
-      authorization: secret,
+      authorization: true,
     });
 
     // @ts-ignore
@@ -495,8 +501,9 @@ describe('Test Catalog', () => {
             }
           ) {
             produtos {
-              preco {
-                valor
+              unidade {
+                preco
+                qtd
               }
               imagem
             }
@@ -511,8 +518,7 @@ describe('Test Catalog', () => {
 
   it('Should not make http calls for unused dynamic fields', async () => {
     const { server, catalogoApi, pessoaApi, precoApi, imagemApi } = constructTestServer({
-      authUser: 1,
-      authorization: secret,
+      authorization: true,
     });
     const mockFn = jest.fn(() => [
       {
@@ -735,7 +741,7 @@ describe('Test Catalog', () => {
   });
 
   it('catalog test and client endpoint', async () => {
-    const { server, catalogoApi } = constructTestServer({ authUser: 1, authorization: secret });
+    const { server, catalogoApi } = constructTestServer({ authorization: true });
 
     // @ts-ignore
     catalogoApi.get = jest.fn(() => ({
@@ -779,45 +785,61 @@ describe('Test Catalog', () => {
   });
 
   it('catalog application endpoint test', async () => {
-    const { server, catalogoApi } = constructTestServer({ authUser: 1, authorization: secret });
+    const { server, catalogoApi } = constructTestServer({ authorization: true });
 
     // @ts-ignore
-    catalogoApi.get = jest.fn(() => [
-      {
-        aplicacao: 'GOL',
-        inicio: '1/1900',
-        fim: '12/1999',
-        original: ' ',
-      },
-      {
-        aplicacao: 'GOL 1.8',
-        inicio: '1/1900',
-        fim: '12/1999',
-        original: ' ',
-      },
-    ]);
+    catalogoApi.get = jest.fn(() => ({
+      listaDados: [
+        {
+          nomeCarro: 'ACCELO',
+          modelTipos: [
+            {
+              tipoNome: '1016/31',
+              geracao: '',
+              motor: '4.8',
+              anos: ['2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019', '2020'],
+              nomeMotor: 'BLUETEC 5',
+              modeloTransmissao: 'FSO 4505 HDA',
+              eixoMotriz: 'HL2',
+            },
+          ],
+        },
+      ],
+      pagina: 1,
+      totalPorPagina: 1,
+    }));
 
     const { query } = createTestClient(server);
 
     const res = await query({
       query: gql`
         {
-          getAplicacoes(buscaAplicacoes: { empresa: 1, fornecedor: 144, produto: "B47097" }) {
-            aplicacao
-            inicio
-            fim
-            original
+          getAplicacoes(buscaAplicacoes: { page: 0, count: 1, codProduto: "1___1847___DNI0102" }) {
+            listaDados {
+              nomeCarro
+              modelTipos {
+                tipoNome
+                geracao
+                motor
+                anos
+                nomeMotor
+                modeloTransmissao
+                eixoMotriz
+              }
+            }
+            pagina
+            totalPorPagina
           }
         }
       `,
     });
 
     // @ts-ignore
-    expect(res.data.getAplicacoes[0]).toHaveProperty('aplicacao');
+    expect(res.data.getAplicacoes).toHaveProperty('listaDados');
   });
 
   it('similar catalog endpoint testing', async () => {
-    const { server, catalogoApi } = constructTestServer({ authUser: 1, authorization: secret });
+    const { server, catalogoApi } = constructTestServer({ authorization: true });
 
     // @ts-ignore
     catalogoApi.get = jest.fn(() => [
@@ -877,7 +899,9 @@ describe('Test Catalog', () => {
     const res = await query({
       query: gql`
         {
-          getSimilar(buscaSimilar: { filial: 34, empresa: 1, fornecedor: 144, produto: "B47097" }) {
+          getSimilares(
+            pesqSimilar: { filial: 34, empresa: 1, fornecedor: 144, produto: "B47097" }
+          ) {
             id
             idEmpresa
             idFornecedor
@@ -891,11 +915,11 @@ describe('Test Catalog', () => {
     });
 
     // @ts-ignore
-    expect(res.data.getSimilar[0]).toHaveProperty('nomeProduto');
+    expect(res.data.getSimilares[0]).toHaveProperty('nomeProduto');
   });
 
   it('autocomplete endpoint test', async () => {
-    const { server, catalogoApi } = constructTestServer({ authUser: 1, authorization: secret });
+    const { server, catalogoApi } = constructTestServer({ authorization: true });
 
     // @ts-ignore
     catalogoApi.get = jest.fn(() => [
@@ -924,5 +948,45 @@ describe('Test Catalog', () => {
 
     // @ts-ignore
     expect(res.data.getAutocomplete[0]).toHaveProperty('descricao');
+  });
+
+  it('estoque endpoin test', async () => {
+    const { server, geralApi } = constructTestServer({ authorization: true });
+
+    // @ts-ignore
+    geralApi.get = jest.fn(() => [
+      {
+        filial: 33,
+        produto: '16001',
+        qtd: 0,
+        qtdInventario: 0,
+        minimo: 0,
+        maximo: 0,
+        ativo: 'S',
+        endereco: 'AV.KAKO CAMINHA',
+      },
+    ]);
+
+    const { query } = createTestClient(server);
+
+    const res = await query({
+      query: gql`
+        {
+          getEstoque(buscaEstoque: { uf: "AM", produto: "16001", empresa: 1, fornecedor: 144 }) {
+            filial
+            produto
+            qtd
+            qtdInventario
+            minimo
+            maximo
+            ativo
+            endereco
+          }
+        }
+      `,
+    });
+
+    // @ts-ignore
+    expect(res.data.getEstoque[0]).toHaveProperty('produto');
   });
 });
